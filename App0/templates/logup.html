@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+
+{% block css %}
+<style>
+    .account {
+        width: 400px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        box-shadow: 5px 5px 20px #aaa;
+
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        padding: 20px 40px;
+    }
+
+    .account h2 {
+        margin-top: 10px;
+        text-align: center;
+    }
+    {#.form-group  {#}
+    {#    margin-top: 10px;#}
+    {#    text-align: center;#}
+    {#}#}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="account">
+    <h2>Log  Up </h2>
+    <div class="panel-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label>username</label>
+                {{ form.username }}
+                <span style="color: red;">{{ form.errors.username.0 }}</span>
+
+            </div>
+            <div class="form-group">
+                <label>password</label>
+                {{ form.password }}
+                <span style="color: red;">{{ form.errors.password.0 }}</span>
+
+            </div>
+            <div class="form-group">
+                <label>firstname</label>
+                {{ form.firstname }}
+                <span style="color: red;">{{ form.errors.firstname.0 }}</span>
+
+            </div>
+            <div class="form-group">
+                <label>lastname</label>
+                {{ form.lastname }}
+                <span style="color: red;">{{ form.errors.lastname.0 }}</span>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary center-block" style="width: 80px;">logup</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
