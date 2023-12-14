@@ -2,7 +2,7 @@ from os import listdir
 import xml.etree.ElementTree as ET
 import jieba
 import sqlite3
-from models import Postings
+from App0.models import Postings
 from django.core.management.base import BaseCommand
 
 class Doc:
@@ -54,7 +54,7 @@ class IndexModule:
     
     def write_postings_to_db(self, postings_lists):
         # 清空现有数据
-        Posting.objects.all().delete()
+        Postings.objects.all().delete()
 
         # 插入新数据
         for key, value in postings_lists.items():
@@ -73,7 +73,8 @@ class IndexModule:
             if (root.find('title').text):
                 title=root.find('title').text
             keywords=root.find('keywords').text
-            discription=root.find('description').text
+            if(root.find('description').text):
+                discription=root.find('description').text
             docid = int(root.find('id').text)
             # print(title)
             # print(discription)
@@ -91,7 +92,7 @@ class IndexModule:
                 else:
                     self.postings_lists[key] = [1, [d]] # [df, [Doc]]
         AVG_L = AVG_L / len(files)
-        self.write_postings_to_db("ir.db")
+        self.write_postings_to_db(self.postings_lists)
 
 class Command(BaseCommand):
     help = 'Constructs postings lists from XML data and writes to the database'
