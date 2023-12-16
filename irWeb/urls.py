@@ -25,5 +25,6 @@ urlpatterns = [
     path('index/', views.index),
     path('login/',account.login),
     path('logup/',account.logup),
-    path('search/',views.search)
+    path('search/',views.search),
+    path('search_word/',views.search_word),
 ]

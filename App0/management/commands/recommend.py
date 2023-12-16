@@ -12,7 +12,7 @@ import numpy as np
 
 from sklearn.metrics import pairwise_distances
 from django.core.management.base import BaseCommand
-from models import Knearest
+from App0.models import Knearest
 
 class recommend:
     stop_words = set()
@@ -163,7 +163,7 @@ class recommend:
         files = listdir(self.doc_dir_path)
         dt_matrix = self.construct_dt_matrix(files, topK)
         self.construct_k_nearest_matrix(dt_matrix, k)
-        self.write_k_nearest_matrix_to_db()
+        self.write_k_nearest_matrix_to_db(self.k_nearest)
 
 
 class Command(BaseCommand):
@@ -171,6 +171,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print('-----start time: %s-----' % (datetime.today()))
-        rm = Recommend()
+        rm = recommend()
         rm.find_k_nearest(5, 25)
         print('-----finish time: %s-----' % (datetime.today()))

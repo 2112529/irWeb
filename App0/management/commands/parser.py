@@ -10,14 +10,14 @@ class Command(BaseCommand):
     def parse_xml_file(self, file_path):
         tree = ET.parse(file_path)
         doc = tree.getroot()
-        # print('Root element:', root.tag)
-        # for child in root:
-        #     print('Child element:', child.tag)
+
         title = doc.find('title').text if doc.find('title') is not None else 'Untitled'
+        # print(title)
         author = doc.find('author').text if doc.find('author') is not None else 'Unknown'
         pub_date = parse_datetime(doc.find('pub_date').text) if doc.find('pub_date') is not None else "2023-10-10"
         content = doc.find('description').text if doc.find('description') is not None else 'None'
         keywords = doc.find('keywords').text if doc.find('keywords') is not None else 'keywords'
+
 
         # 创建新的 NewsArticle 对象
         NewsArticle.objects.create(
@@ -28,11 +28,11 @@ class Command(BaseCommand):
             keywords=keywords
         )
         print("create success!")
-        # for doc in root.findall('doc'):  # 使用 'doc' 替代 'article'
-        #     print("strat create!")
             
 
     def process_xml_files(self, directory):
+        NewsArticle.objects.all().delete()
+
         for filename in os.listdir(directory):
             if filename.endswith(".xml"):
                 file_path = os.path.join(directory, filename)

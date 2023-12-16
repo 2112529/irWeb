@@ -12,11 +12,11 @@ class Users(models.Model):
         db_table = 'users'
 
 class NewsArticle(models.Model):
-    title = models.CharField(max_length=200)  # 文章标题
-    author = models.CharField(max_length=100)  # 作者
-    pub_date = models.DateTimeField()  # 发布日期
-    content = models.TextField()  # 正文
-    keywords = models.TextField()  # 关键词
+    title = models.CharField(max_length=200,null=True)  # 文章标题
+    author = models.CharField(max_length=100,null=True)  # 作者
+    pub_date = models.DateTimeField(null=True)  # 发布日期
+    content = models.TextField(null=True)  # 正文
+    keywords = models.TextField(null=True)  # 关键词
 
     def __str__(self):
         return self.title
