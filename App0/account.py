@@ -1,10 +1,12 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django import forms
 from App0 import views
-
+from django.contrib.auth import authenticate
 
 from App0 import models
 from App0.models import Users
+from django.contrib.auth import logout
+from App0.views import index
 
 
 class UserLoginModelForm(forms.ModelForm):
@@ -69,21 +71,21 @@ def login(request):
         form = LoginForm()
         return render(request, 'login.html', {"form": form})
 
-    form = LoginForm(data=request.POST)
+    form = LoginForm(request.POST)
     if form.is_valid():
-        print("form is valid")
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
 
-        # 去数据库校验用户名和密码是否正确
-        admin_object = Users.objects.filter(**form.cleaned_data).first()
-        # 如果数据库中没有查询到数据
-        if not admin_object:
-        	# 手动抛出错误显示在"password"字段下
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            # 可以在这里保存用户搜索历史，如果需要的话
+            return redirect("/search/")
+        else:
             form.add_error("password", "用户名或密码错误")
             return render(request, 'login.html', {"form": form})
-        return redirect("/index/")
 
     return render(request, 'login.html', {"form": form})
-
 def logup(request):
     """注册"""
     if request.method == "GET":
@@ -94,6 +96,7 @@ def logup(request):
     if form.is_valid():
         print("form is valid")
         admin_object = Users.objects.create(**form.cleaned_data)
+        auth_object =AuthUser.objects.create(user=admin_object)
         # 如果数据库中没有查询到数据
         if not admin_object:
             # 手动抛出错误显示在"password"字段下
@@ -105,4 +108,6 @@ def logup(request):
         print("jump to logup")
         return render(request, 'logup.html', {"form": form})
 
-
+def logout(request):
+    logout(request)
+    return redirect("/index/")  # 登出后重定向到首页或其他页面
