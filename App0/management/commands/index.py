@@ -70,15 +70,15 @@ class IndexModule:
             root = ET.parse(doc_dir_path + file).getroot()
             title=' '
             discription=' '
+            keywords=' '
             if (root.find('title').text):
                 title=root.find('title').text
-            keywords=root.find('keywords').text
+            if(root.find('keywords').text):
+                keywords=root.find('keywords').text
             if(root.find('description').text):
                 discription=root.find('description').text
             docid = int(root.find('id').text)
-            # print(title)
-            # print(discription)
-            seg_list = jieba.lcut(title + '。' + discription, cut_all=False)
+            seg_list = jieba.lcut(title + '。' + discription+'。'+keywords, cut_all=False)
             
             ld, cleaned_dict = self.clean_list(seg_list)
             

@@ -131,10 +131,6 @@ class recommend:
             title = root.find('title').text if root.find('title') is not None else ''
             discription = root.find('description').text if root.find('description') is not None else ''
             keywords = root.find('keywords').text if root.find('keywords') is not None else ''
-            # print("")
-            # print("title:",title)
-            # print("discription:",discription)
-            # print('keywords:',keywords)
             if title==None : 
                 title = ' '
             if discription==None : 
