@@ -29,5 +29,6 @@ urlpatterns = [
     path('search/',views.search),
     path('search_word/',views.search_word),
     path('user_information/', account.user_information),
+    path('edit_info/',account.edit_user_info),
     
 ]

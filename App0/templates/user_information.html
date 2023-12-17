@@ -1,23 +1,29 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="user-info" style="text-align: center; margin-bottom: 20px;">
+<div class="container" style="text-align: center;">
+    <div class="user-info" style="margin-bottom: 20px;">
         <h2>用户信息</h2>
         <p><strong>用户名:</strong> {{ user.username }}</p>
-        <p><strong>姓名:</strong> {{ user.firstname }} {{ user.lastname }}</p>
-        <!-- 添加更多用户信息展示 -->
+        <p><strong>姓名:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>年龄:</strong> {{ user.userinfo.age }}</p>  <!-- 使用 userinfo 关联获取年龄 -->
+        <p><strong>性别:</strong> {{ user.userinfo.gender }}</p>  <!-- 使用 userinfo 关联获取性别 -->
+        <p><strong>职业:</strong> {{ user.userinfo.occupation }}</p>  <!-- 使用 userinfo 关联获取职业 -->
+        <p><strong>地区:</strong> {{ user.userinfo.region }}</p>  <!-- 使用 userinfo 关联获取地区 -->
+
+        <!-- 添加编辑个人信息的链接或按钮 -->
+        <p><a href="/edit_info/" class="btn btn-primary">编辑个人信息</a></p>
     </div>
 
-    <div class="search-history" style="margin: auto; width: 75%;">
+    <div class="search-history" style="width: 75%; margin: auto;">
         <h3>搜索历史</h3>
         {% if search_records %}
-            <ul>
+            <ul style="list-style: none; padding: 0;">
                 {% for record in search_history %}
-                    <div>
-                        <p>搜索时间: {{ record.timestamp }}</p>
-                        <p>搜索内容: {{ record.query }}</p>
-                    </div>
+                    <li style="background-color: #f0f0f0; margin-bottom: 10px; padding: 10px;">
+                        <p><strong>搜索时间:</strong> {{ record.timestamp }}</p>
+                        <p><strong>搜索内容:</strong> {{ record.query }}</p>
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}

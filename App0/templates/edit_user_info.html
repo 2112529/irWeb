@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container" style="text-align: center;">
+    <h2>编辑个人信息</h2>
+    <form method="post" action="/edit_info/">  <!-- 确保 action 路径与您的 URL 配置匹配 -->
+        {% csrf_token %}
+        <div style="margin-bottom: 20px;">
+            <label for="id_age">年龄:</label>
+            <input type="number" id="id_age" name="age" value="{{ user_info.age }}" class="form-control">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label for="id_gender">性别:</label>
+            <input type="text" id="id_gender" name="gender" value="{{ user_info.gender }}" class="form-control">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label for="id_occupation">职业:</label>
+            <input type="text" id="id_occupation" name="occupation" value="{{ user_info.occupation }}" class="form-control">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label for="id_region">地区:</label>
+            <input type="text" id="id_region" name="region" value="{{ user_info.region }}" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">保存更改</button>
+    </form>
+</div>
+{% endblock %}

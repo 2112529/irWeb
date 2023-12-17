@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from datetime import datetime  # 修改这里的导入
+from django.contrib.auth import get_user_model
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -82,3 +83,18 @@ class SearchHistory(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.query} at {self.timestamp}"
+    class Meta:
+        db_table = 'search_history'
+
+
+class UserInfo(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    age = models.IntegerField(null=True, blank=True)
+    gender = models.CharField(max_length=10, null=True, blank=True)
+    occupation = models.CharField(max_length=100, null=True, blank=True)
+    region = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
+    class Meta:
+        db_table = 'user_info'
