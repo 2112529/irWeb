@@ -4,8 +4,9 @@ from App0 import views
 from django.contrib.auth import authenticate
 
 from App0 import models
-from App0.models import Users
-from django.contrib.auth import logout
+from App0.models import Users,SearchHistory,UserInfo
+from django.contrib.auth import logout as auth_logout
+
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.hashers import check_password
 from App0.views import index
@@ -121,5 +122,33 @@ def user_information(request):
 
 
 def logout(request):
-    logout(request)
+    auth_logout(request)
     return redirect("/index/")  # 登出后重定向到首页或其他页面
+
+
+class UserInfoForm(forms.ModelForm):
+    class Meta:
+        model = UserInfo
+        fields = ['age', 'gender', 'occupation', 'region']
+        widgets = {
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+            'gender': forms.TextInput(attrs={'class': 'form-control'}),
+            'occupation': forms.TextInput(attrs={'class': 'form-control'}),
+            'region': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+@login_required
+def edit_user_info(request):
+    user = request.user
+    user_info, created = UserInfo.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        form = UserInfoForm(request.POST, instance=user_info)
+        if form.is_valid():
+            form.save()
+            # 重定向到适当的页面
+            return redirect('some_view')
+    else:
+        form = UserInfoForm(instance=user_info)
+
+    return render(request, 'edit_user_info.html', {'form': form})
