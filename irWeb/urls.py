@@ -28,5 +28,6 @@ urlpatterns = [
     path('logout/',account.logout),
     path('search/',views.search),
     path('search_word/',views.search_word),
+    path('user_information/', account.user_information),
     
 ]

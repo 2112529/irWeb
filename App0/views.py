@@ -2,21 +2,27 @@ from django.shortcuts import render
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+
 from App0 import models
-from App0.models import NewsArticle,Knearest
+from App0.models import NewsArticle,Knearest,SearchHistory
 from App0.search import NewsSearchEngine
 
 def index(req):
     return HttpResponse('welcome to Django Test!')
-def search(req):
-    # 初始化空的查询结果和相关文章列表
+@login_required
+def search(request):
     articles = None
     related_articles = []
     search_attempted = False
 
-    if req.method == 'POST':
+    if request.method == 'POST':
         search_attempted = True
-        title = req.POST.get('title')
+        title = request.POST.get('title')
+
+        # 记录搜索历史
+        if request.user.is_authenticated:
+            SearchHistory.objects.create(user=request.user, query=title)
 
         # 尝试在数据库中搜索对应的文章
         try:
@@ -40,7 +46,7 @@ def search(req):
         except NewsArticle.DoesNotExist:
             articles = None
 
-    return render(req, 'search.html', {
+    return render(request, 'search.html', {
         'articles': articles,
         'related_articles': related_articles,
         'search_attempted': search_attempted

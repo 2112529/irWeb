@@ -9,6 +9,8 @@ from django.contrib.auth import logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.hashers import check_password
 from App0.views import index
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -25,7 +27,7 @@ class LoginForm(forms.Form):  # 直接继承自 forms.Form
         required=True,
     )
 
-class LogupForm(UserLogupModelForm):
+class LogupForm(forms.ModelForm):
     class Meta:
         model = models.Users
         fields = ["username", "password", "firstname", "lastname"]
@@ -105,6 +107,18 @@ def logup(request):
         return redirect("/login/")
     else:
         return render(request, 'logup.html', {"form": form})
+
+
+@login_required
+def user_information(request):
+    # 获取当前用户的信息
+    user_info = request.user
+
+    # 获取用户的搜索记录等其他信息
+    search_history = SearchHistory.objects.filter(user=user_info).order_by('-timestamp')
+
+    return render(request, 'user_information.html', {'user': user_info, 'search_history': search_history})
+
 
 def logout(request):
     logout(request)
