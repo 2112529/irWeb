@@ -6,21 +6,14 @@ from django.contrib.auth import authenticate
 from App0 import models
 from App0.models import Users
 from django.contrib.auth import logout
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.hashers import check_password
 from App0.views import index
 
 
-class UserLoginModelForm(forms.ModelForm):
-    class Meta:
-        model= models.Users
-        fields=["username","password"]
 
-class UserLogupModelForm(forms.ModelForm):
-    class Meta:
-        model= models.Users
-        fields=["username","password","firstname","lastname"]
 
-# 这一次不使用ModelForm,使用Form来实现
-class LoginForm(UserLoginModelForm):
+class LoginForm(forms.Form):  # 直接继承自 forms.Form
     username = forms.CharField(
         label="用户名",
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -28,16 +21,15 @@ class LoginForm(UserLoginModelForm):
     )
     password = forms.CharField(
         label="密码",
-        # render_value=True 表示当提交后,如果密码输入错误,不会自动清空密码输入框的内容
-        widget=forms.PasswordInput(attrs={"class": "form-control"}, ),
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
         required=True,
     )
 
-    def clean_password(self):
-        pwd = self.cleaned_data.get("password")
-        return pwd
-
 class LogupForm(UserLogupModelForm):
+    class Meta:
+        model = models.Users
+        fields = ["username", "password", "firstname", "lastname"]
+
     username = forms.CharField(
         label="用户名",
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -59,6 +51,12 @@ class LogupForm(UserLogupModelForm):
         widget=forms.TextInput(attrs={"class": "form-control"}),
         required=True,
     )
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
     def clean_password(self):
         pwd = self.cleaned_data.get("password")
@@ -76,36 +74,36 @@ def login(request):
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(username=username, password=password)
+        print(user)
         if user is not None:
-            login(request, user)
-            # 可以在这里保存用户搜索历史，如果需要的话
+            # 用户名和密码正确
+            auth_login(request, user)
             return redirect("/search/")
         else:
+            # 用户名或密码不正确
             form.add_error("password", "用户名或密码错误")
-            return render(request, 'login.html', {"form": form})
-
+    else:
+        # 打印表单的错误
+        print("Form errors:", form.errors)
     return render(request, 'login.html', {"form": form})
+
+
 def logup(request):
     """注册"""
     if request.method == "GET":
         form = LogupForm()
         return render(request, 'logup.html', {"form": form})
 
-    form = LogupForm(data=request.POST)
+    form = LogupForm(request.POST)
     if form.is_valid():
-        print("form is valid")
-        admin_object = Users.objects.create(**form.cleaned_data)
-        auth_object =AuthUser.objects.create(user=admin_object)
-        # 如果数据库中没有查询到数据
-        if not admin_object:
-            # 手动抛出错误显示在"password"字段下
-            form.add_error("password", "注册失败")
-            return render(request, 'logup.html', {"form": form})
-        print("jump to login")
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        firstname = form.cleaned_data['firstname']
+        lastname = form.cleaned_data['lastname']
+        Users.objects.create_user(username=username, password=password, firstname=firstname, lastname=lastname)
         return redirect("/login/")
     else:
-        print("jump to logup")
         return render(request, 'logup.html', {"form": form})
 
 def logout(request):

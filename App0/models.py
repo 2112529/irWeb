@@ -1,15 +1,47 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from datetime import datetime  # 修改这里的导入
 
-# Create your models here.
-class Users(models.Model):
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+class CustomUserManager(BaseUserManager):
+    # 创建用户和超级用户的管理器
+    def create_user(self, username, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The Username must be set')
+        user = self.model(username=username, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(username, password, **extra_fields)
+
+class Users(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=100)
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)  # 通常您会需要这个字段
+    is_staff = models.BooleanField(default=False)  # 对于管理站点的访问
+    last_login = models.DateTimeField(null=True, blank=True)  # 添加缺失的字段
+    date_joined = models.DateTimeField(default=datetime.now)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
 
     class Meta:
         db_table = 'users'
+
+    def __str__(self):
+        return self.username
+
 
 class NewsArticle(models.Model):
     title = models.CharField(max_length=200,null=True)  # 文章标题
@@ -43,18 +75,3 @@ class Knearest(models.Model):
     class Meta:
         db_table = 'knearest'
 
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
-    first_name = models.CharField(max_length=150)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
