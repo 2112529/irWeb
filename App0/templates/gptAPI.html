@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<style>
+    .question-box {
+        width: 400px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        box-shadow: 5px 5px 20px #aaa;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        padding: 20px 40px;
+    }
+
+    .question-box h2 {
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="question-box">
+    <h2>Ask a Question</h2>
+    <div class="panel-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Your Question:</label>
+                <input type="text" id="question" name="question" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary center-block" style="width: 80px;">Ask</button>
+        </form>
+
+        {% if question %}
+            <div style="margin-top: 20px;">
+                <p><strong>Question:</strong> {{ question }}</p>
+                <p><strong>Answer:</strong> {{ answer }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -19,6 +19,7 @@ from django.urls import path
 from App0 import views
 from App0.views import index
 from App0 import account
+from App0 import gptAPI
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,5 +31,6 @@ urlpatterns = [
     path('search_word/',views.search_word),
     path('user_information/', account.user_information),
     path('edit_info/',account.edit_user_info),
+    path('gptAPI/',gptAPI.ask_question),
     
 ]
