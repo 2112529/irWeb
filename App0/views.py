@@ -54,21 +54,23 @@ def search(request):
 
 def search_word(req):
      # 初始化空的查询结果和相关文章列表
-    articles = None
+    articles = []
     search_attempted = False
 
     if req.method == 'POST':
         search_attempted = True
         title = req.POST.get('title')
+        print(title)
         # 尝试在数据库中搜索对应的文章
         try:
             search=NewsSearchEngine()
             # search.construct_dt_matrix()
-            search.process_query(title)
+            # search.process_query(title)
             article_idlist=search.search(title)
             print(article_idlist)
             for id in article_idlist:
-                articles=NewsArticle.objects.filter(id=id)
+                # articles=NewsArticle.objects.filter(id=id)
+                articles.append(NewsArticle.objects.get(id=id))
         except NewsArticle.DoesNotExist:
             articles = None
 
@@ -76,3 +78,14 @@ def search_word(req):
         'articles': articles,
         'search_attempted': search_attempted
     })
+
+def wildcard_search(request):
+    query = request.GET.get('query', '')  # 获取查询
+    results = process_wildcard_query(query)  # 处理通配符查询
+    return render(request, 'search_results.html', {'results': results})
+
+def process_wildcard_query(query):
+    # 这里应实现通配符查询的逻辑
+    # 比如，遍历您的索引并找到匹配的文档
+    # 这是一个需要自定义实现的部分，具体取决于您的索引结构和需求
+    pass

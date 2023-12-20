@@ -56,7 +56,7 @@ class NewsSearchEngine:
                 if word == '' or self.is_number(word):
                     continue
                 cleaned_dict[word] = tfidf
-                if word not in  self.terms:
+                if word not in self.terms:
                     self.terms[word] = N
                     N += 1
             dt.append([docid, cleaned_dict])
@@ -79,6 +79,7 @@ class NewsSearchEngine:
     def process_query(self, query):
         # 分词
         query_words = list(jieba.cut(query))
+        # print(self.terms)
         
         # 计算 TF
         tf_query = {}
@@ -93,23 +94,27 @@ class NewsSearchEngine:
             index =  self.terms.get(word)
             if index is not None:
                 query_vector[index] = freq
-
+        # print(query_vector)
         return query_vector
 
 
     def search(self, query):
-        query_vector = self.process_query(query)
+       
+        # print(query_vector)
         files = listdir(self.doc_dir_path)
         self.construct_dt_matrix(files)
+        query_vector = self.process_query(query)
         results = []
         for i, row in self.dt_matrix.iterrows():
             doc_vector = row[1:]  # 跳过文档ID
             similarity = self.calculate_similarity(query_vector, doc_vector)
             results.append((row[0], similarity))  # row[0] 是文档ID
         results.sort(key=lambda x: x[1], reverse=True)  # 按相似度排序
-        # 提取并返回文档ID列表
-        document_ids = [doc_id for doc_id, _ in results]
-        return document_ids
+
+        # 截取相似度排名前五的文档ID
+        top_five_document_ids = [doc_id for doc_id, _ in results[:5]]
+        return top_five_document_ids
+
 
 
     def calculate_similarity(self, vec1, vec2):
@@ -127,9 +132,5 @@ class NewsSearchEngine:
         cosine_similarity = dot_product / (magnitude1 * magnitude2)
         return cosine_similarity
 
-# 使用
-    # def query(self,query):
-    #     engine = NewsSearchEngine()
-    #     results = engine.search("苹果大改，神似红米")
 
-# 输出结果
+
