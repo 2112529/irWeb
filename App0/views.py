@@ -80,12 +80,24 @@ def search_word(req):
     })
 
 def wildcard_search(request):
-    query = request.GET.get('query', '')  # 获取查询
-    results = process_wildcard_query(query)  # 处理通配符查询
-    return render(request, 'search_results.html', {'results': results})
+    if request.method == 'POST':
+        query = request.POST.get('query', '')  # 获取 POST 请求中的查询参数
+        print(query)
+    search_engine = NewsSearchEngine()  # 创建 NewsSearchEngine 实例
 
-def process_wildcard_query(query):
-    # 这里应实现通配符查询的逻辑
-    # 比如，遍历您的索引并找到匹配的文档
-    # 这是一个需要自定义实现的部分，具体取决于您的索引结构和需求
-    pass
+    # 获取倒排索引
+    # inverted_index = search_engine.load_inverted_index()
+
+    # 使用通配符查询处理
+    expanded_queries = search_engine.process_wild_query(query)
+    results = search_engine.search_with_wildcard(expanded_queries, inverted_index)
+
+    # 格式化结果，这里假设 results 是一个包含文档ID的列表
+    formatted_results = []
+    for doc_id in results:
+        # 根据文档ID获取文档详情，这里需要根据您的实际数据模型来实现
+        document = NewsArticle.objects.get(id=doc_id)
+        formatted_results.append(document)
+        # pass
+
+    return render(request, 'search_wildcard.html', {'articles': formatted_results})

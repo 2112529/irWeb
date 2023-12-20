@@ -32,5 +32,6 @@ urlpatterns = [
     path('user_information/', account.user_information),
     path('edit_info/',account.edit_user_info),
     path('gptAPI/',gptAPI.ask_question),
+    path('search_wildcard/',views.wildcard_search),
     
 ]
