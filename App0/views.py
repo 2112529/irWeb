@@ -63,7 +63,8 @@ def search_word(req):
         # 尝试在数据库中搜索对应的文章
         try:
             search=NewsSearchEngine()
-            search.parse_query(title)
+            # search.construct_dt_matrix()
+            search.process_query(title)
             article_idlist=search.search(title)
             print(article_idlist)
             for id in article_idlist:

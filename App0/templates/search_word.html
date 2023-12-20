@@ -3,10 +3,10 @@
 {% block content %}
 <div class="container">
     <div class="search-area" style="text-align: center; margin-bottom: 20px;">
-        <form method="post" action="/search/">
+        <form method="post" action="/search_word/">
             {% csrf_token %}
             <div class="input-group" style="margin: auto; width: 50%; padding: 10px;">
-                <input type="text" class="form-control" name="title" placeholder="Enter Article Title" style="padding: 10px;">
+                <input type="text" class="form-control" name="title" placeholder="Enter Your Search Word" style="padding: 10px;">
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="submit">GO!!!</button>
                 </div>
@@ -25,7 +25,7 @@
             {% endfor %}
         {% else %}
             {% if search_attempted %}
-                <p>No articles found with the given title.</p>
+                <p>No articles found with the given word.</p>
             {% endif %}
         {% endif %}
     </div>

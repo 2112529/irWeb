@@ -19,9 +19,16 @@ class NewsSearchEngine:
         self.stop_words_encoding = "utf-8"
         self.idf_path = "idf.txt"
         self.terms={}
-        self.dt_matrix = []
+        self.dt_matrix = None
+        self.doc_dir_path = "News/"
 
-
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+            
     def construct_dt_matrix(self, files, topK = 200):
         jieba.analyse.set_stop_words(self.stop_words_path)
         jieba.analyse.set_idf_path(self.idf_path)
@@ -61,11 +68,12 @@ class NewsSearchEngine:
                 dt_matrix[i][ self.terms[term]] = tfidf
             i += 1
 
-        dt_matrix = pd.DataFrame(dt_matrix)
-        dt_matrix.index = dt_matrix[0]
-        print('dt_matrix shape:(%d %d)'%(dt_matrix.shape))
-        self.dt_matrix = dt_matrix
-        return dt_matrix
+        # dt_matrix = pd.DataFrame(dt_matrix)
+        
+        self.dt_matrix = pd.DataFrame(dt_matrix)
+        self.dt_matrix.index = self.dt_matrix[0]
+        # print('dt_matrix shape:(%d %d)'%(self.dt_matrix.shape))
+        # return dt_matrix
 
 
     def process_query(self, query):
@@ -90,26 +98,27 @@ class NewsSearchEngine:
 
 
     def search(self, query):
-        query_vector = self.process_query(query, self. self.terms)
+        query_vector = self.process_query(query)
+        files = listdir(self.doc_dir_path)
+        self.construct_dt_matrix(files)
         results = []
         for i, row in self.dt_matrix.iterrows():
             doc_vector = row[1:]  # 跳过文档ID
             similarity = self.calculate_similarity(query_vector, doc_vector)
             results.append((row[0], similarity))  # row[0] 是文档ID
         results.sort(key=lambda x: x[1], reverse=True)  # 按相似度排序
-        return results
+        # 提取并返回文档ID列表
+        document_ids = [doc_id for doc_id, _ in results]
+        return document_ids
 
 
     def calculate_similarity(self, vec1, vec2):
         # 计算两个向量的点积
-        dot_product = 0
-        for word, value in vec1.items():
-            if word in vec2:
-                dot_product += value * vec2[word]
+        dot_product = sum(v1 * v2 for v1, v2 in zip(vec1, vec2))
 
         # 计算两个向量的模
-        magnitude1 = math.sqrt(sum([x**2 for x in vec1.values()]))
-        magnitude2 = math.sqrt(sum([x**2 for x in vec2.values()]))
+        magnitude1 = math.sqrt(sum(x**2 for x in vec1))
+        magnitude2 = math.sqrt(sum(x**2 for x in vec2))
 
         if magnitude1 == 0 or magnitude2 == 0:
             return 0
