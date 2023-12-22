@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import xml.etree.ElementTree as ET
 
+
 def get_news_pool(root, start, end):
     news_pool = []
     for i in range(start,end,-1):
@@ -83,3 +84,7 @@ if __name__ == '__main__':
     news_pool = get_news_pool(root, 854, 849)
     crawl_news(news_pool, "Data/news/", "utf-8")
     print(' worm.py is done!')
+
+
+
+# https://www.sohu.com/?pvid=b6a6473ea63069a1

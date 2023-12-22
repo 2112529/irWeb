@@ -56,6 +56,23 @@ class NewsArticle(models.Model):
     class Meta:
         db_table = 'news_article'
 
+
+class NewsArticle1(models.Model):
+    title = models.CharField(max_length=200,null=True)  # 文章标题
+    url=models.CharField(max_length=200,null=True) #文章链接
+    # author = models.CharField(max_length=100,null=True)  # 作者
+    pub_date = models.DateTimeField(null=True)  # 发布日期
+    content = models.TextField(null=True)  # 正文
+    # keywords = models.TextField(null=True)  # 关键词
+    snapshot = models.TextField(null=True, blank=True)  # 添加用于存储网页快照的字段
+    pagerank_score = models.FloatField(default=0.0)  # 添加 PageRank 分数字段
+    linked_articles = models.ManyToManyField('self', blank=True)  # 添加关联到其他文章的链接
+
+    def __str__(self):
+        return self.title
+    class Meta:
+        db_table = 'news_article1'
+
 class Postings(models.Model):
     term = models.TextField(primary_key=True, blank=True, null=False)
     df = models.IntegerField(blank=True, null=True)
