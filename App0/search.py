@@ -172,25 +172,30 @@ class NewsSearchEngine:
 
     def process_wild_query(self, query):
         self.load_inverted_index()  # 加载倒排索引
-        # print(inverted_index)
+        # print(self.inverted_index)
         all_possible_queries = []
         if '*' in query:
             prefix, suffix = query.split('*', 1)
+            print(prefix, suffix)
             for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix):
-                    all_possible_queries.add(term)
+                    all_possible_queries.append(term)
         elif '?' in query:
             prefix, suffix = query.split('?', 1)
+            print(prefix, suffix)
             for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix) and len(term) == len(query):
-                    all_possible_queries.add(term)
+                    all_possible_queries.append(term)
         # print(all_possible_queries)
         return all_possible_queries
 
 
 
     def search_with_wildcard(self,query):
+        # print(query)
+        
         expanded_queries = self.process_wild_query(query)
+        print(expanded_queries)
         if not expanded_queries or expanded_queries == [['']]:
             return []  # 返回空列表或适当的错误消息
         # print(expanded_queries)
@@ -201,7 +206,7 @@ class NewsSearchEngine:
             if eq in self.inverted_index.keys():
                 matched_documents_id = self.inverted_index[eq]
                 results.update(matched_documents_id)
-
+        print(results)
         return list(results)  # 将结果转换为列表
 
 

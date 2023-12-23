@@ -91,14 +91,14 @@ def wildcard_search(request):
 
 
     # 使用通配符查询处理
-    expanded_queries = search_engine.process_wild_query(query)
-    results = search_engine.search_with_wildcard(expanded_queries)
+    # expanded_queries = search_engine.process_wild_query(query)
+    results = search_engine.search_with_wildcard(query)
 
     # 格式化结果，这里假设 results 是一个包含文档ID的列表
     formatted_results = []
     for doc_id in results:
         # 根据文档ID获取文档详情，这里需要根据您的实际数据模型来实现
-        document = NewsArticle.objects.get(id=doc_id)
+        document = NewsArticle.objects.get(news_id=doc_id)
         formatted_results.append(document)
         # pass
 
