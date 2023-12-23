@@ -78,7 +78,7 @@ class Command(BaseCommand):
             # return(news_pool)
 
     def crawl_news(self, news_pool, doc_dir_path, doc_encoding):
-        i = 1
+        i = 183
         for news in news_pool:
             print(news)
             try:

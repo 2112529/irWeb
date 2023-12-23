@@ -83,6 +83,16 @@ class Postings(models.Model):
     class Meta:
         db_table = 'postings'
 
+class Postings1(models.Model):
+    term = models.TextField(primary_key=True, blank=True, null=False)
+    df = models.IntegerField(blank=True, null=True)
+    docs = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.term
+    class Meta:
+        db_table = 'postings1'
+
 class Knearest(models.Model):
     first = models.IntegerField(blank=True, null=True)
     second = models.IntegerField(blank=True, null=True)

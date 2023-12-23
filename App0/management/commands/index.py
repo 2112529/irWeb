@@ -2,7 +2,7 @@ from os import listdir
 import xml.etree.ElementTree as ET
 import jieba
 import sqlite3
-from App0.models import Postings
+from App0.models import Postings1
 from django.core.management.base import BaseCommand
 
 class Doc:
@@ -54,16 +54,16 @@ class IndexModule:
     
     def write_postings_to_db(self, postings_lists):
         # 清空现有数据
-        Postings.objects.all().delete()
+        Postings1.objects.all().delete()
 
         # 插入新数据
         for key, value in postings_lists.items():
             doc_list = '\n'.join(map(str, value[1]))
-            posting = Postings(term=key, df=value[0], docs=doc_list)
+            posting = Postings1(term=key, df=value[0], docs=doc_list)
             posting.save()
     
     def construct_postings_lists(self):
-        doc_dir_path="News/"
+        doc_dir_path="News1/"
         files = listdir(doc_dir_path)
         AVG_L = 0
         for file in files:
