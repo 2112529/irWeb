@@ -58,9 +58,11 @@ def search_word(req):
     search_attempted = False
 
     if req.method == 'POST':
+        
         search_attempted = True
         title = req.POST.get('title')
-        print(title)
+        if request.user.is_authenticated:
+            SearchHistory.objects.create(user=request.user, query=title)
         # 尝试在数据库中搜索对应的文章
         try:
             search=NewsSearchEngine()
@@ -80,17 +82,17 @@ def search_word(req):
     })
 
 def wildcard_search(request):
+    query=''
     if request.method == 'POST':
         query = request.POST.get('query', '')  # 获取 POST 请求中的查询参数
-        print(query)
+        if request.user.is_authenticated:
+            SearchHistory.objects.create(user=request.user, query=query)
     search_engine = NewsSearchEngine()  # 创建 NewsSearchEngine 实例
 
-    # 获取倒排索引
-    # inverted_index = search_engine.load_inverted_index()
 
     # 使用通配符查询处理
     expanded_queries = search_engine.process_wild_query(query)
-    results = search_engine.search_with_wildcard(expanded_queries, inverted_index)
+    results = search_engine.search_with_wildcard(expanded_queries)
 
     # 格式化结果，这里假设 results 是一个包含文档ID的列表
     formatted_results = []

@@ -40,8 +40,8 @@
                 <ul class="nav navbar-nav">
                     <li><a href="/index/">Main</a></li>
                     <li><a href="/search/">Search</a></li>
-                    <li><a href="/borrow_info/">BORROW_INFO</a></li>
-                    <li><a href="/lost_book_info/">LOST_BOOK_INFO</a></li>
+                    <li><a href="/search_word/">Search Word</a></li>
+                    <li><a href="/search_wildcard/">Search Wild</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
@@ -52,7 +52,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="/user_information/">Information</a></li>
-                                <li><a href="#">Borrow Details</a></li>
+                                <li><a href="/edit_info/">Edit Information</a></li>
                                 <li><a href="#">Library Service</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="/logout/">Quit!!!</a></li>

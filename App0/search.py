@@ -138,7 +138,7 @@ class NewsSearchEngine:
     # 接下来的内容是用于通配查询
     
     def load_inverted_index(self):
-        inverted_index = {}
+        # inverted_index = {}
         postings = Postings.objects.all()
         for posting in postings:
             # 分割每一行，并进一步分割每一行中的数据
@@ -150,32 +150,32 @@ class NewsSearchEngine:
                     doc_id = int(parts[0])  # 将第一个部分转换为整数
                     doc_list.append(doc_id)  # 将doc_id添加到列表中
                 # 如果需要，您还可以提取其他信息，如term出现次数和文档词项总数
-            inverted_index[posting.term] = doc_list
+            self.inverted_index[posting.term] = doc_list
         # print(inverted_index)
-        return inverted_index
+        # return inverted_index
 
 
 
     def process_wild_query(self, query):
-        inverted_index = self.load_inverted_index()  # 加载倒排索引
+        self.load_inverted_index()  # 加载倒排索引
         # print(inverted_index)
         all_possible_queries = []
         if '*' in query:
             prefix, suffix = query.split('*', 1)
-            for term in inverted_index.keys():
+            for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix):
                     all_possible_queries.add(term)
         elif '?' in query:
             prefix, suffix = query.split('?', 1)
-            for term in inverted_index.keys():
+            for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix) and len(term) == len(query):
                     all_possible_queries.add(term)
-        print(all_possible_queries)
+        # print(all_possible_queries)
         return all_possible_queries
 
 
 
-    def search_with_wildcard(self,query, inverted_index):
+    def search_with_wildcard(self,query):
         expanded_queries = self.process_wild_query(query)
         if not expanded_queries or expanded_queries == [['']]:
             return []  # 返回空列表或适当的错误消息
@@ -184,8 +184,8 @@ class NewsSearchEngine:
 
         for eq in expanded_queries:
             # 使用扩展后的查询词在倒排索引中搜索匹配的文档
-            if eq in inverted_index.keys():
-                matched_documents_id = inverted_index[eq]
+            if eq in self.inverted_index.keys():
+                matched_documents_id = self.inverted_index[eq]
                 results.update(matched_documents_id)
 
         return list(results)  # 将结果转换为列表

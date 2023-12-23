@@ -112,11 +112,13 @@ def logup(request):
 
 @login_required
 def user_information(request):
+    print(request)
     # 获取当前用户的信息
     user_info = request.user
+    print(user_info)
 
     # 获取用户的搜索记录等其他信息
-    search_history = SearchHistory.objects.filter(user=user_info).order_by('-timestamp')
+    search_history = SearchHistory.objects.filter(user_id=user_info.user_id).order_by('-timestamp')
 
     return render(request, 'user_information.html', {'user': user_info, 'search_history': search_history})
 
@@ -147,7 +149,7 @@ def edit_user_info(request):
         if form.is_valid():
             form.save()
             # 重定向到适当的页面
-            return redirect('some_view')
+            return redirect('/user_information/')
     else:
         form = UserInfoForm(instance=user_info)
 
