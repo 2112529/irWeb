@@ -65,7 +65,7 @@ class NewsArticle1(models.Model):
     # author = models.CharField(max_length=100,null=True)  # 作者
     pub_date = models.DateTimeField(null=True)  # 发布日期
     content = models.TextField(null=True)  # 正文
-    # keywords = models.TextField(null=True)  # 关键词
+    keywords = models.TextField(null=True)  # 关键词
     snapshot = models.TextField(null=True, blank=True)  # 添加用于存储网页快照的字段
     pagerank_score = models.FloatField(default=0.0)  # 添加 PageRank 分数字段
     linked_articles = models.ManyToManyField('self', blank=True)  # 添加关联到其他文章的链接
