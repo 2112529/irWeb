@@ -61,8 +61,8 @@ def search_word(req):
         
         search_attempted = True
         title = req.POST.get('title')
-        if request.user.is_authenticated:
-            SearchHistory.objects.create(user=request.user, query=title)
+        if req.user.is_authenticated:
+            SearchHistory.objects.create(user=req.user, query=title)
         # 尝试在数据库中搜索对应的文章
         try:
             search=NewsSearchEngine()
@@ -72,7 +72,7 @@ def search_word(req):
             print(article_idlist)
             for id in article_idlist:
                 # articles=NewsArticle.objects.filter(id=id)
-                articles.append(NewsArticle.objects.get(id=id))
+                articles.append(NewsArticle.objects.get(news_id=id))
         except NewsArticle.DoesNotExist:
             articles = None
 

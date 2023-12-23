@@ -10,6 +10,7 @@ def parse_xml_file(file_path):
     root = tree.getroot()
 
     for article in root.findall('article'):  # 假设每篇文章是 <article> 元素
+        new_id= article.find('id').text
         title = article.find('title').text
         author = article.find('author').text
         pub_date = article.find('pub_date').text  # 需要解析成适当的日期时间格式
@@ -18,6 +19,7 @@ def parse_xml_file(file_path):
 
         # 将提取的数据存储到 Django 模型中
         NewsArticle.objects.create(
+            news_id=new_id,
             title=title,
             author=author,
             pub_date=pub_date,  # 确保这是一个 datetime 对象

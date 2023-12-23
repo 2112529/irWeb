@@ -41,16 +41,16 @@ class NewsSearchEngine:
         for file in files:
             root = ET.parse(self.doc_dir_path + file).getroot()
             title = root.find('title').text
-            discription=root.find('description').text
+            # discription=root.find('description').text
             keywords=root.find('keywords').text
             if title==None : 
                 title = ' '
-            if discription==None : 
-                discription = ' '
+            # if discription==None : 
+            #     discription = ' '
             if keywords==None :
                 keywords = ' '
             docid = int(root.find('id').text)
-            tags = jieba.analyse.extract_tags(title + '。' + discription+'。' + keywords, topK=topK, withWeight=True)
+            tags = jieba.analyse.extract_tags(title + '。' + keywords, topK=topK, withWeight=True)
             #tags = jieba.analyse.extract_tags(title, topK=topK, withWeight=True)
             cleaned_dict = {}
             for word, tfidf in tags:
@@ -102,9 +102,14 @@ class NewsSearchEngine:
     def search(self, query):
        
         # print(query_vector)
+        
         files = listdir(self.doc_dir_path)
         self.construct_dt_matrix(files)
+        print(self.terms)
+        print(len(self.terms))
         query_vector = self.process_query(query)
+        print(query_vector)
+        # print(self.dt_matrix)
         results = []
         for i, row in self.dt_matrix.iterrows():
             doc_vector = row[1:]  # 跳过文档ID
@@ -113,7 +118,16 @@ class NewsSearchEngine:
         results.sort(key=lambda x: x[1], reverse=True)  # 按相似度排序
 
         # 截取相似度排名前五的文档ID
-        top_five_document_ids = [doc_id for doc_id, _ in results[:5]]
+        # 如果前五个文档中有的相似度低于第一个文档的一半，则删除
+        if results:
+            highest_similarity = results[0][1]  # 最高相似度
+            top_five_document_ids = [doc_id for doc_id, similarity in results[:5] if similarity >= highest_similarity / 2]
+        else:
+            top_five_document_ids = []
+        # 打印每个文档ID对应的向量
+        for doc_id in top_five_document_ids:
+            doc_vector = self.dt_matrix.loc[doc_id][1:]  # 跳过文档ID，获取向量
+            print(f"Document ID: {doc_id}, Vector: {doc_vector.tolist()}")
         return top_five_document_ids
 
 

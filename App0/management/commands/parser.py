@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def parse_xml_file(self, file_path):
         tree = ET.parse(file_path)
         doc = tree.getroot()
-
+        news_id=doc.find('id').text if doc.find('id') is not None else 0
         title = doc.find('title').text if doc.find('title') is not None else 'Untitled'
         # print(title)
         author = doc.find('author').text if doc.find('author') is not None else 'Unknown'
@@ -21,6 +21,7 @@ class Command(BaseCommand):
 
         # 创建新的 NewsArticle 对象
         NewsArticle.objects.create(
+            news_id=news_id,
             title=title,
             author=author,
             pub_date=pub_date,

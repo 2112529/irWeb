@@ -45,6 +45,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
 
 class NewsArticle(models.Model):
+    news_id = models.IntegerField(default=0)  # 示例：为IntegerField设置默认值
     title = models.CharField(max_length=200,null=True)  # 文章标题
     author = models.CharField(max_length=100,null=True)  # 作者
     pub_date = models.DateTimeField(null=True)  # 发布日期
@@ -58,6 +59,7 @@ class NewsArticle(models.Model):
 
 
 class NewsArticle1(models.Model):
+    news_id = models.IntegerField(default=0)  # 示例：为IntegerField设置默认值
     title = models.CharField(max_length=200,null=True)  # 文章标题
     url=models.CharField(max_length=200,null=True) #文章链接
     # author = models.CharField(max_length=100,null=True)  # 作者
