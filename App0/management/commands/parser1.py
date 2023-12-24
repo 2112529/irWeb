@@ -18,8 +18,7 @@ class Command(BaseCommand):
         url = doc.find('url').text if doc.find('url') is not None else 'No URL'
         pub_date = parse_datetime(doc.find('pub_date').text) if doc.find('pub_date') is not None else None
         content = doc.find('content').text if doc.find('content') is not None else 'No Content'
-        # 使用 TF-IDF 算法提取关键词
-        keywords = jieba.analyse.extract_tags(content, topK=10)
+        keywords=doc.find('keywords').text if doc.find('keywords') is not None else 'No Keywords'
         snapshot = doc.find('snapshot').text if doc.find('snapshot') is not None else 'No Snapshot'
 
         # 获取 PageRank 分数

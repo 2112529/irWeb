@@ -78,7 +78,7 @@ class Command(BaseCommand):
             # return(news_pool)
 
     def crawl_news(self, news_pool, doc_dir_path, doc_encoding):
-        i = 183
+        i = 1
         for news in news_pool:
             print(news)
             try:
@@ -93,7 +93,7 @@ class Command(BaseCommand):
                 paragraphs = div.find_all('p')
                 # 排除最后两个 <p> 标签
                 content = ' '.join(p.get_text().strip() for p in paragraphs[:-2])
-
+                keywords = jieba.analyse.extract_tags(content, topK=10)
                 # content = ' '.join(p.get_text().strip() for p in soup.find_all('p'))
                 article_info=soup.find('div', class_ = "article-info")
                 pub_date=article_info.find('span',class_="time").text
@@ -128,7 +128,7 @@ class Command(BaseCommand):
             ET.SubElement(doc, "url").text = news[0]
             ET.SubElement(doc, "title").text = news[1]
             ET.SubElement(doc,"pub_date").text = pub_date
-            # ET.SubElement(doc, "keywords").text = keywords
+            ET.SubElement(doc, "keywords").text = keywords
             ET.SubElement(doc, "content").text = content
             ET.SubElement(doc, "snapshot").text = snapshot
             ET.SubElement(doc, "pagerank_score").text = str(pagerank_score)

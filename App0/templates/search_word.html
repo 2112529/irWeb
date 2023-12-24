@@ -18,17 +18,41 @@
         {% if articles %}
             {% for article in articles %}
                 <div class="article" style="margin-bottom: 20px; padding: 10px;">
-                    <h2>Article Title: {{ article.title }}</h2>
+                    <!-- 添加链接到文章标题 -->
+                    <h2><a href="{{ article.url }}" target="_blank">Article Title: {{ article.title }}</a></h2>
                     <p><strong>Keywords:</strong> {{ article.keywords }}</p>
-                    <p><strong>Content:</strong> {{ article.content }}</p>
+                    <div id="snapshot-{{ article.news_id }}" style="display: block;">
+                        <p><strong>Snapshot:</strong> {{ article.snapshot }}</p>
+                    </div>
+                    <div id="content-{{ article.news_id }}" style="display: none;">
+                        <p><strong>Content:</strong> {{ article.content }}</p>
+                    </div>
+                    <button id="button-{{ article.news_id }}" onclick="toggleContent('snapshot-{{ article.news_id }}', 'content-{{ article.news_id }}', 'button-{{ article.news_id }}')">查看全部内容</button>
                 </div>
             {% endfor %}
         {% else %}
             {% if search_attempted %}
-                <p>No articles found with the given word.</p>
+                <p>No articles found with the given title.</p>
             {% endif %}
         {% endif %}
     </div>
-</div>
+    
+    <script>
+        function toggleContent(snapshotId, contentId, buttonId) {
+            var snapshot = document.getElementById(snapshotId);
+            var content = document.getElementById(contentId);
+            var button = document.getElementById(buttonId);
+    
+            if (snapshot.style.display === 'none') {
+                snapshot.style.display = 'block';
+                content.style.display = 'none';
+                button.textContent = '查看全部内容';
+            } else {
+                snapshot.style.display = 'none';
+                content.style.display = 'block';
+                button.textContent = '收起';
+            }
+        }
+    </script>
 
 {% endblock %}

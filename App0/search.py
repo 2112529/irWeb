@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.metrics import pairwise_distances
-from App0.models import Postings
+from App0.models import Postings1,NewsArticle1
 
 
 class NewsSearchEngine:
@@ -21,7 +21,7 @@ class NewsSearchEngine:
         self.idf_path = "idf.txt"
         self.terms={}
         self.dt_matrix = None
-        self.doc_dir_path = "News/"
+        self.doc_dir_path = "News1/"
         self.inverted_index = {}
 
     def is_number(self, s):
@@ -39,17 +39,22 @@ class NewsSearchEngine:
         #  self.terms = {}
         dt = []
         for file in files:
-            root = ET.parse(self.doc_dir_path + file).getroot()
-            title = root.find('title').text
-            # discription=root.find('description').text
-            keywords=root.find('keywords').text
+            # root = ET.parse(self.doc_dir_path + file).getroot()
+            # title = root.find('title').text
+            # # discription=root.find('description').text
+            # keywords=root.find('keywords').text
+            # if title==None : 
+            #     title = ' '
+            # # if discription==None : 
+            # #     discription = ' '
+            # if keywords==None :
+            #     keywords = ' '
+            # docid = int(root.find('id').text)
+            docid=file.news_id
+            title = file.title
             if title==None : 
                 title = ' '
-            # if discription==None : 
-            #     discription = ' '
-            if keywords==None :
-                keywords = ' '
-            docid = int(root.find('id').text)
+            keywords = file.keywords
             tags = jieba.analyse.extract_tags(title + '。' + keywords, topK=topK, withWeight=True)
             #tags = jieba.analyse.extract_tags(title, topK=topK, withWeight=True)
             cleaned_dict = {}
@@ -103,13 +108,14 @@ class NewsSearchEngine:
        
         # print(query_vector)
         
-        files = listdir(self.doc_dir_path)
+        # files = listdir(self.doc_dir_path)
+        files=NewsArticle1.objects.all()
         self.construct_dt_matrix(files)
-        print(self.terms)
-        print(len(self.terms))
+        # print(self.terms)
+        # print(len(self.terms))
         query_vector = self.process_query(query)
-        print(query_vector)
-        # print(self.dt_matrix)
+        # print(query_vector)
+        # # print(self.dt_matrix)
         results = []
         for i, row in self.dt_matrix.iterrows():
             doc_vector = row[1:]  # 跳过文档ID
@@ -152,8 +158,7 @@ class NewsSearchEngine:
     # 接下来的内容是用于通配查询
     
     def load_inverted_index(self):
-        # inverted_index = {}
-        postings = Postings.objects.all()
+        postings = Postings1.objects.all()
         for posting in postings:
             # 分割每一行，并进一步分割每一行中的数据
             docs = posting.docs.strip().split('\n')  # 先按行分割
@@ -165,42 +170,32 @@ class NewsSearchEngine:
                     doc_list.append(doc_id)  # 将doc_id添加到列表中
                 # 如果需要，您还可以提取其他信息，如term出现次数和文档词项总数
             self.inverted_index[posting.term] = doc_list
-        # print(inverted_index)
-        # return inverted_index
 
 
 
     def process_wild_query(self, query):
         self.load_inverted_index()  # 加载倒排索引
-        # print(self.inverted_index)
         all_possible_queries = []
         if '*' in query:
             prefix, suffix = query.split('*', 1)
-            print(prefix, suffix)
             for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix):
                     all_possible_queries.append(term)
         elif '?' in query:
             prefix, suffix = query.split('?', 1)
-            print(prefix, suffix)
             for term in self.inverted_index.keys():
                 if term.startswith(prefix) and term.endswith(suffix) and len(term) == len(query):
                     all_possible_queries.append(term)
-        # print(all_possible_queries)
         return all_possible_queries
 
 
 
     def search_with_wildcard(self,query):
-        # print(query)
-        
         expanded_queries = self.process_wild_query(query)
         print(expanded_queries)
         if not expanded_queries or expanded_queries == [['']]:
             return []  # 返回空列表或适当的错误消息
-        # print(expanded_queries)
         results = set()  # 使用集合来避免重复的文档ID
-
         for eq in expanded_queries:
             # 使用扩展后的查询词在倒排索引中搜索匹配的文档
             if eq in self.inverted_index.keys():
