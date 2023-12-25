@@ -9,7 +9,7 @@ from django.contrib.auth import logout as auth_logout
 
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.hashers import check_password
-from App0.views import index
+# from App0.views import index
 from django.contrib.auth.decorators import login_required
 
 

@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<style>
+    .navigation-buttons {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .navigation-buttons a {
+        margin: 0 10px;
+    }
+
+    .recommendations {
+        width: 80%;
+        margin: 20px auto;
+        padding: 10px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        box-shadow: 5px 5px 20px #aaa;
+    }
+
+    .recommendations h2 {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="navigation-buttons">
+    <a href="/p_search/" class="btn btn-primary">P Search</a>
+    <a href="/search/" class="btn btn-primary">Search</a>
+    <a href="/search_word/" class="btn btn-primary">Search Word</a>
+    <a href="/search_wildcard/" class="btn btn-primary">Search Wildcard</a>
+</div>
+
+<div class="recommendations" style="margin: auto; width: 75%;">
+    <h2>Personalized Recommendations</h2>
+    {% for article in recommended_articles %}
+        <div class="article" style="margin-bottom: 20px; padding: 10px;">
+            <!-- 添加链接到文章标题 -->
+            <h2><a href="{{ article.url }}" target="_blank">Article Title: {{ article.title }}</a></h2>
+            <p><strong>Keywords:</strong> {{ article.keywords }}</p>
+            <div id="snapshot-{{ article.news_id }}" style="display: block;">
+                <p><strong>Snapshot:</strong> {{ article.snapshot }}</p>
+            </div>
+            <div id="content-{{ article.news_id }}" style="display: none;">
+                <p><strong>Content:</strong> {{ article.content }}</p>
+            </div>
+            <button id="button-{{ article.news_id }}" onclick="toggleContent('snapshot-{{ article.news_id }}', 'content-{{ article.news_id }}', 'button-{{ article.news_id }}')">查看全部内容</button>
+        </div>
+    {% empty %}
+        <p>No recommendations available.</p>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleContent(snapshotId, contentId, buttonId) {
+        var snapshot = document.getElementById(snapshotId);
+        var content = document.getElementById(contentId);
+        var button = document.getElementById(buttonId);
+
+        if (snapshot.style.display === 'none') {
+            snapshot.style.display = 'block';
+            content.style.display = 'none';
+            button.textContent = '查看全部内容';
+        } else {
+            snapshot.style.display = 'none';
+            content.style.display = 'block';
+            button.textContent = '收起';
+        }
+    }
+</script>
+
+{% endblock %}

@@ -17,13 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from App0 import views
-from App0.views import index
+# from App0.views import index
 from App0 import account
 from App0 import gptAPI
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('index/', views.index),
+    path('Main/', views.main),
     path('login/',account.login),
     path('logup/',account.logup),
     path('logout/',account.logout),
@@ -33,5 +33,6 @@ urlpatterns = [
     path('edit_info/',account.edit_user_info),
     path('gptAPI/',gptAPI.ask_question),
     path('search_wildcard/',views.wildcard_search),
+    path('p_search/',views.p_search),
     
 ]

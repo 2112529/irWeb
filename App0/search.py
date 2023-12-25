@@ -85,16 +85,24 @@ class NewsSearchEngine:
 
     def process_query(self, query):
         # 分词
+        # jieba.analyse.set_stop_words(self.stop_words_path)
+        # query_words=jieba.analyse.extract_tags(query, topK=100, withWeight=False)
         query_words = list(jieba.cut(query))
+        print(query_words)
         # print(self.terms)
         
         # 计算 TF
         tf_query = {}
         for word in query_words:
+            print(word)
             word = word.strip().lower()
             if word in self.terms and word != '' and not self.is_number(word):
-                tf_query[word] = tf_query.get(word, 0) + 1
-
+                if word not in tf_query:
+                    tf_query[word] = 1
+                else:
+                    tf_query[word] += 1
+                # tf_query[word] = tf_query.get(word,0) + 1
+        print(tf_query)
         # 将查询转换为向量
         query_vector = [0] * len( self.terms)
         for word, freq in tf_query.items():

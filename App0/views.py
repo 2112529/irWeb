@@ -8,8 +8,8 @@ from App0 import models
 from App0.models import NewsArticle,Knearest,SearchHistory,NewsArticle1
 from App0.search import NewsSearchEngine
 
-def index(req):
-    return HttpResponse('welcome to Django Test!')
+# def index(req):
+#     return HttpResponse('welcome to Django Test!')
 @login_required
 def search(request):
     articles = None
@@ -108,52 +108,95 @@ def wildcard_search(request):
 
     return render(request, 'search_wildcard.html', {'articles': sorted_articles})
 
+
+from App0.models import UserInfo,SearchHistory
+from collections import Counter
+
+
 @login_required
 def p_search(request):
     articles = []
     sorted_articles = []
     search_attempted = False
+    print("---------------")
 
     if request.method == 'POST':
         search_attempted = True
 
         # 获取用户查询词
         title = request.POST.get('title')
+        title = (title + ' ') * 5  # 重复五遍，并在每次重复后添加空格以分隔单词
+
 
         # 记录用户的搜索历史
         if request.user.is_authenticated:
             SearchHistory.objects.create(user=request.user, query=title)
 
         # 调整查询向量，基于用户特征
-        gender = request.user.gender
-        occupation = request.user.occupation  # 假设有这个字段
+        gender =UserInfo.objects.get(user_id=request.user.user_id).gender
+        occupation = UserInfo.objects.get(user_id=request.user.user_id).occupation
 
-        # 为查询向量添加基于性别的关键词
+       # 为查询向量添加基于性别的关键词
+        additional_terms = []
         if gender == 'Male':
-            title += ' 国家 经济 军队'  # 示例关键词
+            additional_terms.extend(['国家', '经济', '军队'])  # 示例关键词
         elif gender == 'Female':
-            title += ' 明星 火锅 大学'  # 示例关键词
+            additional_terms.extend(['明星', '火锅', '大学'])  # 示例关键词
 
         # 如果用户是学生，添加相关关键词
         if occupation == 'Student':
-            title += ' 学生'
+            additional_terms.append('学生')
 
         # 根据历史搜索记录调整查询向量
-        history_terms = request.user.search_history.all().values_list('query', flat=True)
+        history_terms = SearchHistory.objects.filter(user_id=request.user.user_id).values_list('query', flat=True)
         for term in history_terms:
+            additional_terms.extend(term.split())
+
+        # 计算词频并选择前五个最频繁的词
+        term_frequencies = Counter(additional_terms)
+        top_terms = [term for term, _ in term_frequencies.most_common(5)]
+        
+        # 将核心关键词添加到查询词中
+        for term in top_terms:
             title += ' ' + term
 
         # 执行搜索
         search = NewsSearchEngine()
+        print(title)
         article_idlist = search.search(title)
         for id in article_idlist:
             articles.append(NewsArticle1.objects.get(news_id=id))
 
         sorted_articles = sorted(articles, key=lambda x: x.pagerank_score, reverse=True)
 
-    return render(request, 'search_word.html', {
+    return render(request, 'p_search.html', {
         'articles': sorted_articles,
         'search_attempted': search_attempted
     })
+
+
+@login_required
+def main(request):
+    # 获取当前登录用户的ID
+    user_id = request.user.user_id
+
+    # 获取用户的最近搜索历史
+    recent_searches = SearchHistory.objects.filter(user_id=user_id).order_by('-timestamp')[:5]
+
+    # 提取关键词
+    keywords = set()
+    for search in recent_searches:
+        for keyword in jieba.analyse.extract_tags(search.query):
+            keywords.add(keyword)
+
+    # 基于关键词推荐相关文章
+    recommended_articles = []
+    for keyword in keywords:
+        articles = NewsArticle1.objects.filter(content__icontains=keyword)[:5]
+        recommended_articles.extend(articles)
+
+    return render(request, 'main.html', {'recommended_articles': recommended_articles})
+
+
 
 
