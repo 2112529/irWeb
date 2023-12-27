@@ -125,7 +125,7 @@ def user_information(request):
 
 def logout(request):
     auth_logout(request)
-    return redirect("/index/")  # 登出后重定向到首页或其他页面
+    return redirect("/Main/")  # 登出后重定向到首页或其他页面
 
 
 class UserInfoForm(forms.ModelForm):

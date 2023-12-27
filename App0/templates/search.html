@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <div class="search-area" style="text-align: center; margin-bottom: 20px;">
+    <!-- <div class="search-area" style="text-align: center; margin-bottom: 20px;">
         <form method="post" action="/search/">
             {% csrf_token %}
             <div class="input-group" style="margin: auto; width: 50%; padding: 10px;">
@@ -12,8 +12,25 @@
                 </div>
             </div>
         </form>
+    </div> -->
+    <div class="search-area" style="text-align: center; margin-bottom: 20px;">
+        <form method="post" action="/search/">
+            {% csrf_token %}
+            <div class="input-group" style="margin: auto; width: 50%; padding: 10px;">
+                <input type="text" class="form-control" name="title" placeholder="Enter Article Title" style="padding: 10px;">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">GO!!!</button>
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <label><input type="checkbox" name="category" value="政治"> 政治</label>
+                <label><input type="checkbox" name="category" value="经济"> 经济</label>
+                <label><input type="checkbox" name="category" value="社会"> 社会</label>
+                <label><input type="checkbox" name="category" value="娱乐"> 娱乐</label>
+                <label><input type="checkbox" name="category" value="宠物"> 宠物</label>
+            </div>
+        </form>
     </div>
-
     <div class="results-area" style="margin: auto; width: 75%;">
         {% if articles %}
             {% for article in articles %}

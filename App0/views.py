@@ -19,14 +19,18 @@ def search(request):
     if request.method == 'POST':
         search_attempted = True
         title = request.POST.get('title')
-
+        selected_categories = request.POST.getlist('category')
         # 记录搜索历史
         if request.user.is_authenticated:
             SearchHistory.objects.create(user=request.user, query=title)
 
         # 尝试在数据库中搜索对应的文章
         try:
-            articles = NewsArticle1.objects.filter(title=title).values('title','keywords','content','snapshot').distinct()
+            # 根据标题和选定的类型搜索文章
+            articles_query = NewsArticle1.objects.filter(title__icontains=title)
+            if selected_categories:
+                articles_query = articles_query.filter(category__in=selected_categories)
+            articles = articles_query.values('title', 'keywords', 'content', 'snapshot').distinct()
 
             # 如果找到匹配的文章
             # if articles.exists():
