@@ -9,7 +9,7 @@ import math
 
 import pandas as pd
 import numpy as np
-
+import re
 from sklearn.metrics import pairwise_distances
 from App0.models import Postings1,NewsArticle1
 
@@ -184,16 +184,18 @@ class NewsSearchEngine:
     def process_wild_query(self, query):
         self.load_inverted_index()  # 加载倒排索引
         all_possible_queries = []
-        if '*' in query:
-            prefix, suffix = query.split('*', 1)
-            for term in self.inverted_index.keys():
-                if term.startswith(prefix) and term.endswith(suffix):
-                    all_possible_queries.append(term)
-        elif '?' in query:
-            prefix, suffix = query.split('?', 1)
-            for term in self.inverted_index.keys():
-                if term.startswith(prefix) and term.endswith(suffix) and len(term) == len(query):
-                    all_possible_queries.append(term)
+        # 将 '*' 替换为 '.*'，将 '?' 替换为 '.'
+        # 这样，'*' 匹配任意长度的字符，'?' 匹配单个字符
+        regex_pattern = query.replace('*', '.*').replace('?', '.')
+
+        # 创建一个正则表达式对象
+        pattern = re.compile("^" + regex_pattern + "$")
+
+        # 检查每个词是否匹配正则表达式
+        for term in self.inverted_index.keys():
+            if pattern.match(term):
+                all_possible_queries.append(term)
+
         return all_possible_queries
 
 

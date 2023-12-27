@@ -79,65 +79,84 @@ class Command(BaseCommand):
 
     def crawl_news(self, news_pool, doc_dir_path, doc_encoding):
         i = 1
-        for news in news_pool:
-            print(news)
-            try:
-                response = urllib.request.urlopen(news[0])
-            except Exception as e:
-                print("-----%s: %s-----" % (type(e), news[0]))
-                continue
-            html = response.read()
-            soup = BeautifulSoup(html, "lxml")
-            try:
-                div=soup.find('div',class_='left main')
-                paragraphs = div.find_all('p')
-                # 排除最后两个 <p> 标签
-                content = ' '.join(p.get_text().strip() for p in paragraphs[:-2])
-                keywords = jieba.analyse.extract_tags(content, topK=10)
-                # content = ' '.join(p.get_text().strip() for p in soup.find_all('p'))
-                article_info=soup.find('div', class_ = "article-info")
-                pub_date=article_info.find('span',class_="time").text
-                # 提取网页快照（例如前几个段落）
-                snapshot = ' '.join(p.get_text() for p in soup.find_all('p')[1:3])
-                pagerank_score=0.0,  # 初始设置为0，稍后计算
-                # 获取所有可以链接到 的文章
-                linked_articles = []
-                # outnum=0
-        
-                # for item in div.find_all('allsee-item'):
-                #     outnum+=1
-                #     print(item)
-                #     link=item.find('a')
-                #     href = link.get('href')
-                #     if href.startswith('http') or href.startswith('//www'):
-                #         if href.startswith('//'):
-                #             href = "https:" + href
-                #         else:
-                #             url = href
-                #     else:
-                #         url = "https://www.sohu.com" + href
+        news_pool1=[]
+        while 1:
+            for news in news_pool:
+                print(news)
+                try:
+                    response = urllib.request.urlopen(news[0])
+                except Exception as e:
+                    print("-----%s: %s-----" % (type(e), news[0]))
+                    continue
+                html = response.read()
+                soup = BeautifulSoup(html, "lxml")
+                try:
+                    div=soup.find('div',class_='left main')
+                    paragraphs = div.find_all('p')
+                    # 排除最后两个 <p> 标签
+                    content = ' '.join(p.get_text().strip() for p in paragraphs[:-2])
+                    keywords = jieba.analyse.extract_tags(content, topK=10)
+                    # content = ' '.join(p.get_text().strip() for p in soup.find_all('p'))
+                    article_info=soup.find('div', class_ = "article-info")
+                    pub_date=article_info.find('span',class_="time").text
+                    # 提取网页快照（例如前几个段落）
+                    snapshot = ' '.join(p.get_text() for p in soup.find_all('p')[1:3])
+                    pagerank_score=0.0,  # 初始设置为0，稍后计算
+                    # 获取所有可以链接到 的文章
+                    linked_articles = []
+                    # outnum=0
+                    # 配置Selenium使用Chrome浏览器
+                    driver = webdriver.Chrome(executable_path="D:\QQFileRec\GoogleDownload\chromedriver_win32\chromedriver.exe")
                     
-                #     linked_articles.append(href)
-                # linked_articles 需要在所有文章都保存后处理
-            except Exception as e:
-                print("-----%s: %s-----" % (type(e), news[0]))
-                continue
-            
-            doc = ET.Element("doc")
-            ET.SubElement(doc, "id").text = str(i)
-            ET.SubElement(doc, "url").text = news[0]
-            ET.SubElement(doc, "title").text = news[1]
-            ET.SubElement(doc,"pub_date").text = pub_date
-            ET.SubElement(doc, "keywords").text = keywords
-            ET.SubElement(doc, "content").text = content
-            ET.SubElement(doc, "snapshot").text = snapshot
-            ET.SubElement(doc, "pagerank_score").text = str(pagerank_score)
-            ET.SubElement(doc, "linked_articles").text = ",".join(linked_articles)
-            tree = ET.ElementTree(doc)
+                    # 打开目标网页
+                    driver.get(url)
+                    
+                    # 等待网页加载（如果需要）
+                    driver.implicitly_wait(10)  # 等待10秒
 
-            file_path = doc_dir_path + "%d.xml" % i        
-            tree.write(file_path, encoding=doc_encoding, xml_declaration=True)
-            i += 1
+                    # 获取网页源代码
+                    html = driver.page_source
+                    soup = BeautifulSoup(html, 'html.parser')
+                    div1=soup.find('div',class_='left main')
+                    for item in div.find_all('allsee-item'):
+                        outnum+=1
+                        print(item)
+                        link=item.find('a')
+                        href = link.get('href')
+                        if href.startswith('http') or href.startswith('//www'):
+                            if href.startswith('//'):
+                                href = "https:" + href
+                            else:
+                                url = href
+                        else:
+                            url = "https://www.sohu.com" + href
+                        
+                        linked_articles.append(href)
+                        news_pool1.append(href)
+                        # news
+                    # linked_articles 需要在所有文章都保存后处理
+                except Exception as e:
+                    print("-----%s: %s-----" % (type(e), news[0]))
+                    continue
+                
+                doc = ET.Element("doc")
+                ET.SubElement(doc, "id").text = str(i)
+                ET.SubElement(doc, "url").text = news[0]
+                ET.SubElement(doc, "title").text = news[1]
+                ET.SubElement(doc,"pub_date").text = pub_date
+                ET.SubElement(doc, "keywords").text = keywords
+                ET.SubElement(doc, "content").text = content
+                ET.SubElement(doc, "snapshot").text = snapshot
+                ET.SubElement(doc, "pagerank_score").text = str(pagerank_score)
+                ET.SubElement(doc, "linked_articles").text = ",".join(linked_articles)
+                tree = ET.ElementTree(doc)
+
+                file_path = doc_dir_path + "%d.xml" % i        
+                tree.write(file_path, encoding=doc_encoding, xml_declaration=True)
+                i += 1
+
+        if i>=12000:break
+        else : news_pool=news_pool1
 
     def handle(self, *args, **options):
         root = 'https://www.sohu.com/?pvid=b6a6473ea63069a1'
