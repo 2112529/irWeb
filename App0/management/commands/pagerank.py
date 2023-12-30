@@ -27,30 +27,7 @@ class Command(BaseCommand):
         # 完成处理后的信息
         self.stdout.write(self.style.SUCCESS('Finished processing articles'))
 
-    def assign_linked_articles(self):
-        # 获取所有文章并按 news_id 排序
-        all_articles = NewsArticle1.objects.all().order_by('news_id')
-
-        # 计算总文章数量
-        total_articles = len(all_articles)
-
-        # 遍历每篇文章
-        for index, article in enumerate(all_articles):
-            # 根据 news_id 计算要链接的文章数量
-            # 例如，对于前10%的文章，我们可以链接最多10篇文章，以此类推
-            max_links = max(1, 10 - (index * 10 // total_articles))
-
-            # 从所有文章中随机选择要链接的文章
-            linked_articles = random.sample(list(all_articles), min(max_links, total_articles))
-
-            # 确保不要链接到文章自身
-            linked_articles = [linked_article for linked_article in linked_articles if linked_article != article]
-
-            # 设置 linked_articles 字段
-            article.linked_articles.set(linked_articles)
-
-            # 保存更改
-            article.save()
+    
     def calculate_pagerank(self):
         # 创建一个有向图
         G = nx.DiGraph()
@@ -74,6 +51,5 @@ class Command(BaseCommand):
             article.save()
     def handle(self, *args, **kwargs):
         # self.singlenews()
-        # self.assign_linked_articles()
         self.calculate_pagerank()
         

@@ -39,24 +39,12 @@ class NewsSearchEngine:
         #  self.terms = {}
         dt = []
         for file in files:
-            # root = ET.parse(self.doc_dir_path + file).getroot()
-            # title = root.find('title').text
-            # # discription=root.find('description').text
-            # keywords=root.find('keywords').text
-            # if title==None : 
-            #     title = ' '
-            # # if discription==None : 
-            # #     discription = ' '
-            # if keywords==None :
-            #     keywords = ' '
-            # docid = int(root.find('id').text)
             docid=file.news_id
             title = file.title
             if title==None : 
                 title = ' '
             keywords = file.keywords
             tags = jieba.analyse.extract_tags(title + '。' + keywords, topK=topK, withWeight=True)
-            #tags = jieba.analyse.extract_tags(title, topK=topK, withWeight=True)
             cleaned_dict = {}
             for word, tfidf in tags:
                 word = word.strip().lower()
@@ -79,8 +67,6 @@ class NewsSearchEngine:
         
         self.dt_matrix = pd.DataFrame(dt_matrix)
         self.dt_matrix.index = self.dt_matrix[0]
-        # print('dt_matrix shape:(%d %d)'%(self.dt_matrix.shape))
-        # return dt_matrix
 
 
     def process_query(self, query):
