@@ -88,7 +88,7 @@ class NewsSearchEngine:
         # jieba.analyse.set_stop_words(self.stop_words_path)
         # query_words=jieba.analyse.extract_tags(query, topK=100, withWeight=False)
         query_words = list(jieba.cut(query))
-        print(query_words)
+        # print(query_words)
         # print(self.terms)
         
         # 计算 TF
@@ -102,7 +102,7 @@ class NewsSearchEngine:
                 else:
                     tf_query[word] += 1
                 # tf_query[word] = tf_query.get(word,0) + 1
-        print(tf_query)
+        # print(tf_query)
         # 将查询转换为向量
         query_vector = [0] * len( self.terms)
         for word, freq in tf_query.items():
@@ -135,13 +135,13 @@ class NewsSearchEngine:
         # 如果前五个文档中有的相似度低于第一个文档的一半，则删除
         if results:
             highest_similarity = results[0][1]  # 最高相似度
-            top_five_document_ids = [doc_id for doc_id, similarity in results[:5] if similarity >= highest_similarity / 2]
+            top_five_document_ids = [doc_id for doc_id, similarity in results[:5] if similarity >= highest_similarity / 10]
         else:
             top_five_document_ids = []
         # 打印每个文档ID对应的向量
         for doc_id in top_five_document_ids:
             doc_vector = self.dt_matrix.loc[doc_id][1:]  # 跳过文档ID，获取向量
-            print(f"Document ID: {doc_id}, Vector: {doc_vector.tolist()}")
+            # print(f"Document ID: {doc_id}, Vector: {doc_vector.tolist()}")
         return top_five_document_ids
 
 
@@ -202,7 +202,7 @@ class NewsSearchEngine:
 
     def search_with_wildcard(self,query):
         expanded_queries = self.process_wild_query(query)
-        print(expanded_queries)
+        # print(expanded_queries)
         if not expanded_queries or expanded_queries == [['']]:
             return []  # 返回空列表或适当的错误消息
         results = set()  # 使用集合来避免重复的文档ID
@@ -211,7 +211,7 @@ class NewsSearchEngine:
             if eq in self.inverted_index.keys():
                 matched_documents_id = self.inverted_index[eq]
                 results.update(matched_documents_id)
-        print(results)
+        # print(results)
         return list(results)  # 将结果转换为列表
 
 
